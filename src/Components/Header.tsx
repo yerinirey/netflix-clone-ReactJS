@@ -130,7 +130,6 @@ function Header() {
     } else {
       navAnimation.start("top");
     }
-    console.log(v);
   });
   return (
     <Nav variants={navVars} animate={navAnimation} initial={"top"}>

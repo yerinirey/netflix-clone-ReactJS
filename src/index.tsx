@@ -69,6 +69,9 @@ a {
   text-decoration:none;
   color:inherit;
 }
+html {
+  overflow-x: hidden;
+}
 `;
 const client = new QueryClient();
 const root = ReactDOM.createRoot(

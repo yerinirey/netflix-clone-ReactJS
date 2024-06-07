@@ -99,7 +99,7 @@ const navVars = {
   top: {
     backgroundColor: "rgba(0,0,0,0)",
   },
-  scroll: { backgroundColor: "rgba(0,0,0,1)" },
+  scroll: { backgroundColor: "#141414" },
 };
 
 function Header() {

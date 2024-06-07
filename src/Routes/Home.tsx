@@ -60,33 +60,54 @@ const Box = styled(motion.div)<{ $bgPhoto: string }>`
   background-color: white;
   background-image: url(${(props) => props.$bgPhoto});
   background-position: center center;
-  color: red;
   font-size: 40px;
   background-size: cover;
   height: 200px;
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
 `;
-
-// const rowVars = {
-//   hidden: {
-//     x: window.innerWidth,
-//   },
-//   visible: {
-//     x: 0,
-//   },
-//   exit: {
-//     x: -window.innerWidth,
-//   },
-// };
+const Info = styled(motion.div)`
+  padding: 10px;
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  h4 {
+    text-align: center;
+    font-size: 18px;
+  }
+`;
+const boxVars = {
+  normal: {
+    scale: 1,
+  },
+  hover: {
+    scale: 1.3,
+    y: -50,
+    transition: { delay: 0.4, type: "tween", duration: 0.2 },
+  },
+};
+const infoVars = {
+  hover: {
+    opacity: 1,
+    transition: { delay: 0.4, type: "tween", duration: 0.2 },
+  },
+};
+const offset = 6; // the number of movies to show at a time
 
 function Home() {
   const { data, isLoading } = useQuery<IGetMoviesResult>({
     queryKey: ["movies", "nowPlaying"],
     queryFn: getMovies,
   });
-  // console.log(data);
+
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
-  const offset = 6; // the number of movies to show at a time
   const increaseIndex = () => {
     if (data) {
       if (leaving) return;
@@ -121,10 +142,6 @@ function Home() {
           <Slider>
             <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
               <Row
-                // variants={rowVars}
-                // initial="hidden"
-                // animate="visible"
-                // exit="exit"
                 initial={{ x: width }}
                 animate={{ x: 0 }}
                 exit={{ x: -width }}
@@ -137,8 +154,16 @@ function Home() {
                   .map((movie) => (
                     <Box
                       key={movie.id}
+                      variants={boxVars}
+                      whileHover="hover"
+                      initial="normal"
+                      transition={{ type: "tween" }}
                       $bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                    ></Box>
+                    >
+                      <Info variants={infoVars}>
+                        <h4>{movie.title}</h4>
+                      </Info>
+                    </Box>
                   ))}
               </Row>
             </AnimatePresence>

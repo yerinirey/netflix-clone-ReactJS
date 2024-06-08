@@ -20,8 +20,27 @@ export interface IGetMoviesResult {
   total_results: number;
 }
 
+interface IGenre {
+  id: number;
+  name: string;
+}
+export interface IMovieDetail {
+  adult: boolean;
+  genres: IGenre[];
+  tagline: string;
+  vote_average: number;
+  release_date: string;
+}
+
 export function getMovies() {
+  console.log(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`);
   return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
+    (response) => response.json()
+  );
+}
+
+export function getMovieDetail(movieId: string) {
+  return fetch(`${BASE_PATH}/movie/${movieId}?api_key=${API_KEY}`).then(
     (response) => response.json()
   );
 }

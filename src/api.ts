@@ -1,5 +1,6 @@
 const API_KEY = "0a61e6abbc460b2dbf8a754c1c363f7c";
 const BASE_PATH = "https://api.themoviedb.org/3";
+const QUERY_PARAMS = `api_key=${API_KEY}&language=ko-KO&region=KR`;
 
 export interface IMovie {
   id: number;
@@ -32,9 +33,15 @@ export interface IMovieDetail {
   release_date: string;
 }
 
-export function getMovies() {
-  console.log(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`);
-  return fetch(`${BASE_PATH}/movie/now_playing?api_key=${API_KEY}`).then(
+export function getNowPlayingMovies() {
+  return fetch(`${BASE_PATH}/movie/now_playing?${QUERY_PARAMS}`).then(
+    (response) => response.json()
+  );
+}
+
+export function getTopRatedMovies() {
+  console.log(`${BASE_PATH}/movie/top_rated?${QUERY_PARAMS}`);
+  return fetch(`${BASE_PATH}/movie/top_rated?${QUERY_PARAMS}`).then(
     (response) => response.json()
   );
 }

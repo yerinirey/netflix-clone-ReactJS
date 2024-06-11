@@ -40,14 +40,24 @@ export function getNowPlayingMovies() {
 }
 
 export function getTopRatedMovies() {
-  console.log(`${BASE_PATH}/movie/top_rated?${QUERY_PARAMS}`);
   return fetch(`${BASE_PATH}/movie/top_rated?${QUERY_PARAMS}`).then(
     (response) => response.json()
   );
 }
+export function getUpcomingMovies() {
+  return fetch(`${BASE_PATH}/movie/upcoming?${QUERY_PARAMS}`).then((response) =>
+    response.json()
+  );
+}
 
 export function getMovieDetail(movieId: string) {
-  return fetch(`${BASE_PATH}/movie/${movieId}?api_key=${API_KEY}`).then(
+  return fetch(`${BASE_PATH}/movie/${movieId}?${QUERY_PARAMS}`).then(
+    (response) => response.json()
+  );
+}
+
+export function getMovieVideo(movieId: string) {
+  return fetch(`${BASE_PATH}/movie/${movieId}/videos?${QUERY_PARAMS}`).then(
     (response) => response.json()
   );
 }

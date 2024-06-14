@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { IGetMoviesResult, IMovie } from "../api";
+import { IGetTvResult, ITv } from "../api";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -142,44 +142,43 @@ const boxVars = {
   },
 };
 const arrow = { PREV: "prev", NEXT: "next" };
-export default function MovieSlider({ category, title, width }: IProps) {
+export default function TvSlider({ category, title, width }: IProps) {
   const cache = useQueryClient();
-  const data = cache.getQueryData(["movies", category]) as IGetMoviesResult;
-
+  const data = cache.getQueryData(["tv", category]) as IGetTvResult;
   const [isNext, setIsNext] = useState<boolean>();
   const [leaving, setLeaving] = useState(false);
   const [index, setIndex] = useState(0);
   const toggleLeaving = () => setLeaving((p) => !p);
   const navigate = useNavigate();
-  const [movies, setMovies] = useState<IMovie[] | undefined>(data?.results);
+  const [tvs, setTvs] = useState<ITv[] | undefined>(data?.results);
   useEffect(() => {
-    if (category === categories.movie.NOW_PLAYING)
-      setMovies(data?.results.filter((_, idx) => idx !== 0));
+    if (category === categories.tv.TOP_RATED)
+      setTvs(data?.results.filter((_, idx) => idx !== 0));
   }, [data?.results]);
   const onNextIndex = async (dir: string) => {
-    if (movies) {
+    if (tvs) {
       if (leaving) return;
-      let newMovies;
+      let newTvs;
       toggleLeaving();
       if (dir === arrow.NEXT) {
         // next
-        const copyMovies1 = movies.slice(0, 6);
-        const copyMovies2 = movies.slice(6, movies.length);
-        newMovies = [...copyMovies2, ...copyMovies1];
+        const copyTv1 = tvs.slice(0, 6);
+        const copyTv2 = tvs.slice(6, tvs.length);
+        newTvs = [...copyTv2, ...copyTv1];
         await setIsNext(true);
       } else if (dir === arrow.PREV) {
         // previous
-        const copyMovies1 = movies.slice(movies.length - 6, movies.length);
-        const copyMovies2 = movies.slice(0, movies.length - 6);
-        newMovies = [...copyMovies1, ...copyMovies2];
+        const copyTv1 = tvs.slice(tvs.length - 6, tvs.length);
+        const copyTv2 = tvs.slice(0, tvs.length - 6);
+        newTvs = [...copyTv1, ...copyTv2];
         await setIsNext(false);
       }
-      setMovies(newMovies);
+      setTvs(newTvs);
       setIndex((p) => p + 1);
     }
   };
-  const onBoxClick = (movieId: number) => {
-    navigate(`/movies/${movieId}`);
+  const onBoxClick = (tvId: number) => {
+    navigate(`/tv/${tvId}`);
   };
   return (
     <Container>
@@ -193,18 +192,18 @@ export default function MovieSlider({ category, title, width }: IProps) {
             transition={{ type: "tween", duration: 0.5 }}
             key={index}
           >
-            {movies?.slice(0, 8).map((movie, idx) => (
+            {tvs?.slice(0, 8).map((tv, idx) => (
               <Box
-                layoutId={movie.id + category}
+                layoutId={tv.id + category}
                 className="box"
-                key={movie.id}
-                onClick={() => onBoxClick(movie.id)}
+                key={tv.id}
+                onClick={() => onBoxClick(tv.id)}
                 variants={boxVars}
                 initial="normal"
                 whileHover={idx !== 0 && idx !== 7 ? "hover" : undefined}
                 transition={{ type: "tween" }}
                 $bgPhoto={makeImagePath(
-                  movie.backdrop_path ?? movie.poster_path,
+                  tv.backdrop_path ?? tv.poster_path,
                   "w500"
                 )}
               >
@@ -253,7 +252,7 @@ export default function MovieSlider({ category, title, width }: IProps) {
                       </svg>
                     </InfoBtn>
                   </InfoBtnContainer>
-                  <h4>{movie.title}</h4>
+                  <h4>{tv.name}</h4>
                 </Info>
               </Box>
             ))}

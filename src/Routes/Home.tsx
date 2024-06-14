@@ -14,11 +14,13 @@ import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import MovieSlider from "../Components/MovieSlider";
 import MovieBanner from "../Components/MovieBanner";
 import MovieDetail from "../Components/MovieDetail";
+import { categories } from "../utils";
 
 /* Base Components */
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.black.veryDark};
   overflow-x: hidden;
+  overflow-y: hidden;
   padding-bottom: 100px;
 `;
 const Loader = styled.div`
@@ -43,13 +45,6 @@ const Overlay = styled(motion.div)`
   background-color: rgba(0, 0, 0, 0.6);
   opacity: 0;
 `;
-const categories = {
-  movie: {
-    NOW_PLAYING: "now_playing",
-    TOP_RATED: "top_rated",
-    UPCOMING: "upcoming",
-  },
-};
 
 function Home() {
   const { data: nowData, isLoading: nowLoading } = useQuery<IGetMoviesResult>({
@@ -93,7 +88,7 @@ function Home() {
   /* check fetch success */
   useEffect(() => {
     if (nowData && topData && upcomingData) {
-      console.log("successed fetching all movies");
+      console.log("succeed fetching all movies");
       setAllMovies([
         ...nowData?.results.filter((_, idx) => idx !== 0),
         ...topData?.results,
@@ -102,28 +97,20 @@ function Home() {
     }
   }, [nowData, topData, upcomingData]);
 
-  const onClick = (clickedCategory: string) => {
-    setCategory(clickedCategory);
-  };
+  const onClick = (clickedCategory: string) => setCategory(clickedCategory);
   const clickedMovie =
     (detailMovieMatch?.params.movieId &&
       allMovies?.find(
         (movie) => movie.id + "" === detailMovieMatch.params.movieId
-      )) ||
+      )) ??
     nowData?.results[0];
-  console.log("clickedMovie ?", clickedMovie);
-  console.log("detailMatch?", detailMovieMatch);
   return (
     <Wrapper>
       {loading ? (
         <Loader>Loading</Loader>
       ) : (
         <>
-          <div
-            onClick={() => {
-              onClick(categories.movie.NOW_PLAYING);
-            }}
-          >
+          <div onClick={() => onClick(categories.movie.NOW_PLAYING)}>
             <MovieBanner />
           </div>
           <div onClick={() => onClick(categories.movie.NOW_PLAYING)}>
@@ -148,7 +135,7 @@ function Home() {
             />
           </div>
           <AnimatePresence>
-            {detailMovieMatch ? (
+            {detailMovieMatch && (
               <>
                 <Overlay
                   onClick={onOverlayClick}
@@ -164,7 +151,7 @@ function Home() {
                   />
                 )}
               </>
-            ) : null}
+            )}
           </AnimatePresence>
         </>
       )}

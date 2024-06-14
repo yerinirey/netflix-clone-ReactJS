@@ -1,5 +1,3 @@
-import styled from "styled-components";
-import { makeImagePath } from "../utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IGetMoviesResult,
@@ -7,85 +5,28 @@ import {
   getMovieImages,
   getMovieImagesUs,
 } from "../api";
+import {
+  BannerBtn1,
+  BannerBtn2,
+  BannerBtnBox,
+  BannerContainer,
+  BannerDetail,
+  BannerOverview,
+  BannerTitle,
+  Logo,
+  categories,
+  makeImagePath,
+} from "../utils";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-
-const BannerContainer = styled.div<{ $bgPhoto: string }>`
-  height: 84vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-  background-image: linear-gradient(
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.5) 10%,
-      rgba(0, 0, 0, 0),
-      ${(props) => props.theme.black.veryDark}
-    ),
-    url(${(props) => props.$bgPhoto});
-  background-size: cover;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.45), 2px 2px 20px rgba(0, 0, 0, 0.45);
-`;
-const BannerDetail = styled.div`
-  width: 40%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-const Logo = styled(motion.div)`
-  width: 100%;
-  height: 16vw;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
-  filter: drop-shadow(0px 10px 12px black);
-`;
-const BannerTitle = styled.h2`
-  font-size: 3.2vw;
-  font-weight: 600;
-`;
-const BannerOverview = styled.p`
-  font-size: 1vw;
-  line-height: 1.3;
-  font-weight: 500;
-`;
-const BannerBtnBox = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-`;
-const BannerBtn1 = styled.div`
-  background-color: #fff;
-  padding: 0.4vw 1vw;
-  font-size: 1vw;
-  font-weight: 500;
-  text-shadow: none;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 0.3rem;
-  svg {
-    width: 1.3vw;
-    height: 1.3vw;
-  }
-  &:hover {
-    opacity: 0.7;
-    cursor: pointer;
-  }
-`;
-const BannerBtn2 = styled(BannerBtn1)`
-  background-color: rgba(109, 109, 110, 1);
-  color: white;
-  fill: white;
-`;
 
 export default function MovieBanner() {
   const cache = useQueryClient();
   const movie = (
-    cache.getQueryData(["movies", "now_playing"]) as IGetMoviesResult
+    cache.getQueryData([
+      "movies",
+      categories.movie.NOW_PLAYING,
+    ]) as IGetMoviesResult
   ).results[0];
   const navigate = useNavigate();
   const { data: img, isLoading: imgLoading } = useQuery<IImages>({

@@ -1,17 +1,16 @@
 import { motion } from "framer-motion";
 import styled from "styled-components";
 import {
-  IImage,
+  IGetEpisodes,
   IImages,
-  IMovie,
-  IMovieCredit,
-  IMovieDetail,
+  ITv,
+  ITvDetail,
   IWatchProviders,
-  getMovieCredits,
-  getMovieDetail,
-  getMovieImages,
-  getMovieImagesUs,
-  getWatchProvidersForMovie,
+  getTvDetail,
+  getTvEpisodes,
+  getTvImages,
+  getTvImagesUs,
+  getWatchProvidersForTv,
 } from "../api";
 import { makeImagePath } from "../utils";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +19,8 @@ import { useEffect, useState } from "react";
 const Container = styled(motion.div)`
   position: absolute;
   width: 50vw;
-  height: 90vh;
+  min-height: 90vh;
+  height: auto;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -29,10 +29,11 @@ const Container = styled(motion.div)`
   overflow: hidden;
   z-index: 2;
   box-shadow: 0 0 2vw black;
+  padding-bottom: 7vw;
 `;
 const Cover = styled.div`
   width: 100%;
-  height: 49%;
+  height: 49vh;
   background-size: cover;
   background-position: center center;
 `;
@@ -42,6 +43,7 @@ const Details = styled.div`
   justify-content: space-between;
   padding: 0 30px;
   padding-top: 1vw;
+  padding-bottom: 1vw;
   color: ${(props) => props.theme.white.lighter};
 `;
 const Detail = styled.div`
@@ -49,10 +51,17 @@ const Detail = styled.div`
   flex-direction: column;
   gap: 14px;
   width: 60%;
-  &:last-child {
+  &:nth-child(2) {
     width: 35%;
     display: flex;
     flex-direction: column;
+  }
+`;
+const Episodes = styled.div`
+  padding: 0 30px;
+  margin-top: 2vw;
+  h2 {
+    font-size: 1.2vw;
   }
 `;
 const Logo = styled.div`
@@ -92,7 +101,7 @@ const SmallDetailL = styled.div`
 const SmallBox = styled.div`
   display: flex;
   flex-direction: row;
-  width: 50%;
+  width: 100%;
   gap: 0.5vw;
   font-size: 0.8vw;
   color: #bcbcbc;
@@ -153,8 +162,58 @@ const NoOTT = styled.span`
   font-style: italic;
   color: gray;
 `;
+const EpisodeHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5vw;
+`;
+const Episode = styled.div`
+  height: 6vw;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+  gap: 0.5vw;
+  border-radius: 0.3rem;
+  border-bottom: 1px solid ${(props) => props.theme.black.lighter};
+  h1 {
+    font-size: 1.2vw;
+    padding-right: 0.5vw;
+  }
+  h2 {
+    font-weight: 600;
+    font-size: 0.8vw;
+  }
+  h3 {
+    font-size: 0.6vw;
+  }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+`;
+const EpisodeImg = styled.div`
+  height: 4.6vw;
+  width: 7.5vw;
+  background-size: cover;
+  background-position: center center;
+  border-radius: 0.3rem;
+`;
+const EpisodeDetail = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+`;
+const SelectSeason = styled.select`
+  background-color: ${(props) => props.theme.black.lighter};
+  padding: 0.5vw 1vw;
+  color: white;
+`;
+
 interface IDetail {
-  movie: IMovie;
+  tv: ITv;
   category?: string;
   height: number;
   $isBanner: boolean;
@@ -171,51 +230,38 @@ const bannerVars = {
   },
 };
 
-export default function MovieDetail({
-  movie,
-  category,
-  height,
-  $isBanner,
-}: IDetail) {
-  const movieId = movie.id;
-  const { data, isLoading } = useQuery<IMovieDetail>({
-    queryKey: ["movies", movieId + ""],
-    queryFn: () => getMovieDetail(movieId + ""),
-  });
-  const { data: watchProviders, isLoading: providersLoading } =
-    useQuery<IWatchProviders>({
-      queryKey: ["movies", movieId + "", "watch_providers"],
-      queryFn: () => getWatchProvidersForMovie(movieId + ""),
-    });
-  const { data: credits, isLoading: creditsLoading } = useQuery<IMovieCredit>({
-    queryKey: ["movies", movieId + "", "credits"],
-    queryFn: () => getMovieCredits(movieId + ""),
+export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
+  const [seasonNumber, setSeasonNumber] = useState(1);
+  const tvId = tv.id;
+  const { data, isLoading } = useQuery<ITvDetail>({
+    queryKey: ["tv", tvId + ""],
+    queryFn: () => getTvDetail(tvId + ""),
   });
   const { data: img, isLoading: imgLoading } = useQuery<IImages>({
-    queryKey: ["movies", movieId + "", "images"],
-    queryFn: () => getMovieImages(movieId + ""),
+    queryKey: ["tv", tvId + "", "images"],
+    queryFn: () => getTvImages(tvId + ""),
   });
   const { data: imgUs, isLoading: imgUsLoading } = useQuery<IImages>({
-    queryKey: ["movies", movieId + "", "images_us"],
-    queryFn: () => getMovieImagesUs(movieId + ""),
+    queryKey: ["tv", tvId + "", "images_us"],
+    queryFn: () => getTvImagesUs(tvId + ""),
   });
-
+  const { data: providerData, isLoading: providerLoading } =
+    useQuery<IWatchProviders>({
+      queryKey: ["tv", tvId + "", "watch_providers"],
+      queryFn: () => getWatchProvidersForTv(tvId + ""),
+    });
+  const { data: episodes } = useQuery<IGetEpisodes>({
+    queryKey: ["tv", tvId + "", seasonNumber],
+    queryFn: () => getTvEpisodes(tvId + "", seasonNumber + ""),
+  });
+  const handleSeasonChange = (event: any) => {
+    setSeasonNumber(event.target.value);
+  };
+  console.log(data);
   const [stars, setStars] = useState<[number, number, number]>();
   const [providers, setProviders] = useState<string[]>();
   const [logo, setLogo] = useState<string>("");
-
   useEffect(() => {
-    if (watchProviders && watchProviders.results) {
-      const buys =
-        watchProviders.results?.KR?.buy?.map((c) => c.logo_path) || [];
-      const flatrates =
-        watchProviders?.results?.KR?.flatrate?.map((c) => c.logo_path) || [];
-      const rents =
-        watchProviders?.results?.KR?.rent?.map((c) => c.logo_path) || [];
-      const result = [...buys, ...flatrates, ...rents];
-      // const uniqueResult = [...new Set(result)];
-      setProviders(Array.from(new Set(result)));
-    }
     if (data?.vote_average) {
       const rating = data.vote_average / 2;
       const fullStar = Math.floor(rating);
@@ -228,10 +274,20 @@ export default function MovieDetail({
     } else if (imgUs?.logos && imgUs?.logos.length !== 0) {
       setLogo(imgUs.logos[0].file_path);
     }
-  }, [watchProviders?.results, data?.vote_average, img?.logos, imgUs?.logos]);
+    if (providerData && providerData?.results?.KR) {
+      const buys =
+        providerData?.results?.KR?.buy?.map((c) => c.logo_path) || [];
+      const flatrates =
+        providerData?.results?.KR?.flatrate?.map((c) => c.logo_path) || [];
+      const rents =
+        providerData?.results?.KR?.rent?.map((c) => c.logo_path) || [];
+      const result = [...buys, ...flatrates, ...rents];
+      setProviders(result);
+    }
+  }, [data?.vote_average, img?.logos, providerData?.results?.KR]);
   return (
     <Container
-      layoutId={$isBanner ? "banner" : movie.id + category!}
+      layoutId={$isBanner ? "banner" : tv.id + category!}
       style={{ top: height + 32 }}
       variants={$isBanner ? bannerVars : undefined}
       initial={$isBanner ? "initial" : undefined}
@@ -244,7 +300,7 @@ export default function MovieDetail({
             style={{
               backgroundImage: `linear-gradient(transparent 50%, #181818 100%),
                           url(${makeImagePath(
-                            movie.backdrop_path ?? movie.poster_path
+                            tv.backdrop_path ?? tv.poster_path
                           )})`,
             }}
           />
@@ -257,19 +313,17 @@ export default function MovieDetail({
                   }}
                 />
               ) : (
-                <Title>{movie.title}</Title>
+                <Title>{tv.name}</Title>
               )}
 
               <SmallDetailL>
                 <SmallBox>
                   <Adult>{data?.adult ? "19+" : "12+"}</Adult>
-                  <span>{data?.release_date.split("-")[0]}</span>
-                  <span>
-                    {data?.runtime &&
-                      `${Math.floor(data.runtime / 60)}시간 ${
-                        data.runtime % 60 !== 0 && `${data.runtime % 60}분`
-                      }`}
-                  </span>
+                  <span>{`${data?.first_air_date.split("-")[0]}-${
+                    data?.last_air_date.split("-")[0]
+                  }, ${data?.status} · ${
+                    data?.number_of_seasons
+                  }개 시즌`}</span>
                 </SmallBox>
                 {stars && (
                   <Rating>
@@ -304,7 +358,31 @@ export default function MovieDetail({
                 )}
               </SmallDetailL>
               <Tagline>{data?.tagline && `❝${data.tagline}❞`}</Tagline>
-              <Overview>{movie.overview}</Overview>
+              <Overview>{tv.overview}</Overview>
+            </Detail>
+            <Detail>
+              {data?.genres && (
+                <SmallDetailR>
+                  <span style={{ color: "gray" }}>장르: </span>
+                  {data?.genres.map(
+                    (genre, idx) =>
+                      `${genre.name}${idx < data.genres.length - 1 ? "," : ""}`
+                  )}
+                </SmallDetailR>
+              )}
+              {data?.created_by.length !== 0 && (
+                <SmallDetailR>
+                  <span style={{ color: "gray" }}>제작: </span>
+                  {data?.created_by.map(
+                    (member, idx) =>
+                      `${member.name}${
+                        idx < data.created_by.length - 1 ? "," : ""
+                      }`
+                  )}
+                </SmallDetailR>
+              )}
+            </Detail>
+            <>
               {data?.production_companies && (
                 <Companies>
                   {data.production_companies.map(
@@ -336,34 +414,58 @@ export default function MovieDetail({
               ) : (
                 <NoOTT>No OTT Provided Yet</NoOTT>
               )}
-            </Detail>
-            <Detail>
-              {data?.genres && (
-                <SmallDetailR>
-                  <span style={{ color: "gray" }}>장르: </span>
-                  {data?.genres.map(
-                    (genre, idx) =>
-                      `${genre.name}${idx < data.genres.length - 1 ? "," : ""}`
-                  )}
-                </SmallDetailR>
-              )}
-              {credits && (
-                <SmallDetailR>
-                  <span style={{ color: "gray" }}>출연: </span>
-                  {credits.cast
-                    ?.slice(0, 5)
-                    .map(
-                      (actor, idx) =>
-                        `${actor.name}${
-                          idx < 4 && idx < credits.cast.length - 1 ? ", " : ""
-                        }`
-                    )
-                    .join("")}
-                  {credits.cast.length > 5 && "..."}
-                </SmallDetailR>
-              )}
-            </Detail>
+            </>
           </Details>
+          <Episodes>
+            <EpisodeHeader>
+              <h2>회차</h2>
+              <SelectSeason onChange={handleSeasonChange} value={seasonNumber}>
+                {data?.seasons.map((season) => (
+                  <option
+                    key={season.season_number}
+                    value={season.season_number}
+                  >
+                    {season.name}
+                  </option>
+                ))}
+              </SelectSeason>
+            </EpisodeHeader>
+            <div>{episodes?.name}:</div>
+            {episodes &&
+              episodes.episodes.length > 0 &&
+              episodes.episodes.map((episode) => (
+                <Episode key={episode.id}>
+                  <h1>{episode.episode_number}</h1>
+                  <EpisodeImg
+                    style={{
+                      backgroundImage: `url(${makeImagePath(
+                        episode.still_path
+                      )})`,
+                    }}
+                  />
+                  <EpisodeDetail>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        marginBottom: "0.3vw",
+                      }}
+                    >
+                      <h2>{episode.name}</h2>
+                      <h2>{episode.runtime}분</h2>
+                    </div>
+                    <h3
+                      style={{
+                        paddingRight: "2vw",
+                      }}
+                    >
+                      {episode.overview}
+                    </h3>
+                  </EpisodeDetail>
+                </Episode>
+              ))}
+          </Episodes>
         </>
       )}
     </Container>

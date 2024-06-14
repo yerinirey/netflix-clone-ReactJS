@@ -1,7 +1,15 @@
 import styled from "styled-components";
 import { makeImagePath } from "../utils";
-import { useQueryClient } from "@tanstack/react-query";
-import { IGetMoviesResult } from "../api";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  IGetMoviesResult,
+  IImages,
+  getMovieImages,
+  getMovieImagesUs,
+} from "../api";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const BannerContainer = styled.div<{ $bgPhoto: string }>`
   height: 84vh;
@@ -24,6 +32,14 @@ const BannerDetail = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
+`;
+const Logo = styled(motion.div)`
+  width: 100%;
+  height: 16vw;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0px 10px 12px black);
 `;
 const BannerTitle = styled.h2`
   font-size: 3.2vw;
@@ -66,15 +82,35 @@ const BannerBtn2 = styled(BannerBtn1)`
   fill: white;
 `;
 
-export default function MainBanner() {
+export default function MovieBanner() {
   const cache = useQueryClient();
   const movie = (
-    cache.getQueryData(["movies", "nowPlaying"]) as IGetMoviesResult
+    cache.getQueryData(["movies", "now_playing"]) as IGetMoviesResult
   ).results[0];
+  const navigate = useNavigate();
+  const { data: img, isLoading: imgLoading } = useQuery<IImages>({
+    queryKey: ["movies", movie.id + "", "images"],
+    queryFn: () => getMovieImages(movie.id + ""),
+  });
+  const { data: imgUs, isLoading: imgUsLoading } = useQuery<IImages>({
+    queryKey: ["movies", movie.id + "", "images-us"],
+    queryFn: () => getMovieImagesUs(movie.id + ""),
+  });
+  const [logo, setLogo] = useState<string>("");
+  useEffect(() => {
+    if (img && img?.logos.length !== 0) setLogo(img?.logos[0].file_path);
+    else if (imgUs && imgUs?.logos.length !== 0)
+      setLogo(imgUs?.logos[0].file_path);
+  }, [img, imgUs]);
   return (
     <BannerContainer $bgPhoto={makeImagePath(movie.backdrop_path || "")}>
       <BannerDetail>
-        <BannerTitle>{movie.title}</BannerTitle>
+        {logo !== "" ? (
+          <Logo style={{ backgroundImage: `url(${makeImagePath(logo)})` }} />
+        ) : (
+          <BannerTitle>{movie.title}</BannerTitle>
+        )}
+
         <BannerOverview>{movie.overview}</BannerOverview>
         <BannerBtnBox>
           <BannerBtn1>
@@ -93,7 +129,7 @@ export default function MainBanner() {
             </svg>
             <span>재생</span>
           </BannerBtn1>
-          <BannerBtn2>
+          <BannerBtn2 onClick={() => navigate(`/movies/${movie.id}`)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

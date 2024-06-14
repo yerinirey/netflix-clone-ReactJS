@@ -5,8 +5,8 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { Link, useFormAction, useMatch, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link, useMatch, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.nav)`
@@ -22,6 +22,7 @@ const Nav = styled(motion.nav)`
   font-weight: 500;
   color: white;
   padding: 0 60px;
+  z-index: 1;
 `;
 const Col = styled.div`
   display: flex;
@@ -145,6 +146,7 @@ function Header() {
     <Nav variants={navVars} animate={navAnimation} initial={"top"}>
       <Col>
         <Logo
+          onClick={() => navigate("/")}
           variants={logoVars}
           initial="normal"
           whileHover="active"

@@ -69,7 +69,6 @@ const Box = styled(motion.div)<{ $bgPhoto: string }>`
   height: 200px;
   width: calc(100% / 8);
   border-radius: 8px;
-
   &:nth-child(2) {
     transform-origin: center left;
   }
@@ -84,7 +83,9 @@ const Info = styled(motion.div)`
   opacity: 0;
   position: absolute;
   width: 100%;
-  bottom: -0.5vw;
+  left: 0;
+  right: 0;
+  bottom: -2.7vw;
   border-radius: 0 0 8px 8px;
   h4 {
     text-align: left;
@@ -151,6 +152,10 @@ export default function MovieSlider({ category, title, width }: IProps) {
   const toggleLeaving = () => setLeaving((p) => !p);
   const navigate = useNavigate();
   const [movies, setMovies] = useState<IMovie[] | undefined>(data?.results);
+  useEffect(() => {
+    if (category === "now_playing")
+      setMovies(data?.results.filter((_, idx) => idx !== 0));
+  }, [data?.results]);
   const onNextIndex = async (dir: string) => {
     if (movies) {
       if (leaving) return;
@@ -158,18 +163,17 @@ export default function MovieSlider({ category, title, width }: IProps) {
       toggleLeaving();
       if (dir === arrow.NEXT) {
         // next
-        const copyMovies1 = movies.slice(0, 7);
-        const copyMovies2 = movies.slice(7, movies.length);
+        const copyMovies1 = movies.slice(0, 6);
+        const copyMovies2 = movies.slice(6, movies.length);
         newMovies = [...copyMovies2, ...copyMovies1];
         await setIsNext(true);
       } else if (dir === arrow.PREV) {
         // previous
-        const copyMovies1 = movies.slice(movies.length - 7, movies.length);
-        const copyMovies2 = movies.slice(0, movies.length - 7);
+        const copyMovies1 = movies.slice(movies.length - 6, movies.length);
+        const copyMovies2 = movies.slice(0, movies.length - 6);
         newMovies = [...copyMovies1, ...copyMovies2];
         await setIsNext(false);
       }
-
       setMovies(newMovies);
       setIndex((p) => p + 1);
     }
@@ -186,12 +190,12 @@ export default function MovieSlider({ category, title, width }: IProps) {
             initial={{ x: isNext ? width : -width }}
             animate={{ x: 0 }}
             exit={{ x: isNext ? -width : width }}
-            transition={{ type: "spring", duration: 0.5 }}
+            transition={{ type: "tween", duration: 0.5 }}
             key={index}
           >
             {movies?.slice(0, 8).map((movie, idx) => (
               <Box
-                layoutId={movie.id + ""}
+                layoutId={movie.id + category}
                 className="box"
                 key={movie.id}
                 onClick={() => onBoxClick(movie.id)}
@@ -237,7 +241,7 @@ export default function MovieSlider({ category, title, width }: IProps) {
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
-                        viewBox="-1 0 24 24"
+                        viewBox="0 1 24 24"
                         role="img"
                         data-icon="ThumbsUpStandard"
                         aria-hidden="true"

@@ -328,8 +328,9 @@ export const Detail = styled.div`
 export const ContentName = styled.h2`
   font-size: 3vw;
   position: absolute;
-  top: 35%;
-  text-shadow: 0 0 5px black;
+  bottom: 3vw;
+  left: 1vw;
+  text-shadow: 0 0 10px black;
 `;
 export const Tagline = styled.h3`
   font-style: italic;

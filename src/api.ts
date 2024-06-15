@@ -212,3 +212,9 @@ export function getTvEpisodes(tvId: string, seasonNumber: string) {
     `${BASE_PATH}/tv/${tvId}/season/${seasonNumber}?${QUERY_PARAMS}`
   ).then((response) => response.json());
 }
+
+export function getSearchForMovies(query: string) {
+  return fetch(
+    `${BASE_PATH}/search/movie?query=${query}&include_adult=true&${QUERY_PARAMS}`
+  );
+}

@@ -6,45 +6,14 @@ import {
   getTopRatedMovies,
   getUpcomingMovies,
 } from "../api";
-import styled from "styled-components";
 
-import { motion, AnimatePresence, useScroll } from "framer-motion";
+import { AnimatePresence, useScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import MovieSlider from "../Components/MovieSlider";
 import MovieBanner from "../Components/MovieBanner";
 import MovieDetail from "../Components/MovieDetail";
-import { categories } from "../utils";
-
-/* Base Components */
-const Wrapper = styled.div`
-  background-color: ${(props) => props.theme.black.veryDark};
-  overflow-x: hidden;
-  overflow-y: hidden;
-  padding-bottom: 100px;
-`;
-const Loader = styled.div`
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1vw;
-`;
-
-/* Slider Components */
-const Sliders = styled.div`
-  /* position: relative; */
-  /* top: -200px; */
-`;
-/* Overlay and Detail Components */
-const Overlay = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  opacity: 0;
-`;
+import { categories, Wrapper, Loader, Overlay } from "../utils";
 
 function Home() {
   const { data: nowData, isLoading: nowLoading } = useQuery<IGetMoviesResult>({

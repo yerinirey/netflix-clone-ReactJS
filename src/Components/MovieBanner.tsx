@@ -13,7 +13,7 @@ import {
   BannerDetail,
   BannerOverview,
   BannerTitle,
-  Logo,
+  BannerLogo,
   categories,
   makeImagePath,
 } from "../utils";
@@ -47,7 +47,9 @@ export default function MovieBanner() {
     <BannerContainer $bgPhoto={makeImagePath(movie.backdrop_path || "")}>
       <BannerDetail>
         {logo !== "" ? (
-          <Logo style={{ backgroundImage: `url(${makeImagePath(logo)})` }} />
+          <BannerLogo
+            style={{ backgroundImage: `url(${makeImagePath(logo)})` }}
+          />
         ) : (
           <BannerTitle>{movie.title}</BannerTitle>
         )}

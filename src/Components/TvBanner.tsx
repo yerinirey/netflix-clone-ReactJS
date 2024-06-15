@@ -7,7 +7,7 @@ import {
   BannerDetail,
   BannerOverview,
   BannerTitle,
-  Logo,
+  BannerLogo,
   makeImagePath,
 } from "../utils";
 import { IGetMoviesResult, IImages, getTvImages } from "../api";
@@ -32,7 +32,9 @@ export default function TvBanner() {
       <BannerDetail>
         {" "}
         {logo !== "" ? (
-          <Logo style={{ backgroundImage: `url(${makeImagePath(logo)})` }} />
+          <BannerLogo
+            style={{ backgroundImage: `url(${makeImagePath(logo)})` }}
+          />
         ) : (
           <BannerTitle>{tv.title}</BannerTitle>
         )}

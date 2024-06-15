@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import styled from "styled-components";
 import {
   IGetEpisodes,
@@ -12,162 +11,40 @@ import {
   getTvImagesUs,
   getWatchProvidersForTv,
 } from "../api";
-import { makeImagePath } from "../utils";
+import {
+  Adult,
+  Companies,
+  Company,
+  ContentName,
+  Cover,
+  Detail,
+  DetailContainer,
+  Details,
+  Logo,
+  NoOTT,
+  OTT,
+  OTTs,
+  Overview,
+  Rating,
+  SmallBox,
+  SmallDetailL,
+  SmallDetailR,
+  Tagline,
+  bannerVars,
+  getMainLogo,
+  getProviders,
+  getStarRating,
+  makeImagePath,
+} from "../utils";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-const Container = styled(motion.div)`
-  position: absolute;
-  width: 50vw;
-  min-height: 90vh;
-  height: auto;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  background-color: ${(props) => props.theme.black.darker};
-  border-radius: 10px;
-  overflow: hidden;
-  z-index: 2;
-  box-shadow: 0 0 2vw black;
-  padding-bottom: 7vw;
-`;
-const Cover = styled.div`
-  width: 100%;
-  height: 49vh;
-  background-size: cover;
-  background-position: center center;
-`;
-const Details = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 0 30px;
-  padding-top: 1vw;
-  padding-bottom: 1vw;
-  color: ${(props) => props.theme.white.lighter};
-`;
-const Detail = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 60%;
-  &:nth-child(2) {
-    width: 35%;
-    display: flex;
-    flex-direction: column;
-  }
-`;
 const Episodes = styled.div`
   padding: 0 30px;
   margin-top: 2vw;
   h2 {
     font-size: 1.2vw;
   }
-`;
-const Logo = styled.div`
-  width: 20vw;
-  height: 8vw;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
-  position: absolute;
-  top: 12vw;
-`;
-const Title = styled.h2`
-  font-size: 3vw;
-  position: absolute;
-  top: 35%;
-  text-shadow: 0 0 5px black;
-`;
-const Tagline = styled.h3`
-  font-style: italic;
-  font-size: 0.8vw;
-`;
-const Overview = styled.p`
-  position: relative;
-  font-size: 0.7vw;
-  line-height: 1.8;
-`;
-const SmallDetailR = styled.div`
-  justify-content: right;
-  font-size: 0.7vw;
-`;
-const SmallDetailL = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`;
-const SmallBox = styled.div`
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  gap: 0.5vw;
-  font-size: 0.8vw;
-  color: #bcbcbc;
-  align-items: center;
-`;
-const Adult = styled.span`
-  border: 1px solid gray;
-  color: white;
-  width: 2.2vw;
-  text-align: center;
-`;
-const Rating = styled.div`
-  display: flex;
-  width: 50%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  svg {
-    fill: #ffd900;
-    width: 1vw;
-  }
-`;
-const Companies = styled.div`
-  display: flex;
-  float: right;
-  gap: 5px;
-  position: absolute;
-  bottom: 3.6vw;
-`;
-const Company = styled.div`
-  width: 5vw;
-  height: 3vw;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 0.2vw;
-`;
-const OTTs = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  position: absolute;
-  bottom: 1vw;
-`;
-const OTT = styled.div`
-  width: 2.2vw;
-  height: 2.2vw;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
-  border-radius: 0.5rem;
-`;
-const NoOTT = styled.span`
-  position: absolute;
-  bottom: 1vw;
-  font-size: 1.2vw;
-  font-style: italic;
-  color: gray;
-`;
-const EpisodeHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 0.5vw;
 `;
 const Episode = styled.div`
   height: 6vw;
@@ -194,6 +71,13 @@ const Episode = styled.div`
     background-color: rgba(255, 255, 255, 0.2);
   }
 `;
+const EpisodeHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5vw;
+`;
 const EpisodeImg = styled.div`
   height: 4.6vw;
   width: 7.5vw;
@@ -211,82 +95,60 @@ const SelectSeason = styled.select`
   padding: 0.5vw 1vw;
   color: white;
 `;
-
 interface IDetail {
   tv: ITv;
   category?: string;
   height: number;
   $isBanner: boolean;
 }
-const bannerVars = {
-  initial: {
-    opacity: 0,
-  },
-  visible: {
-    opacity: 1,
-  },
-  exit: {
-    opacity: 0,
-  },
-};
-
 export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
-  const [seasonNumber, setSeasonNumber] = useState(1);
-  const tvId = tv.id;
+  /* Fetching */
   const { data, isLoading } = useQuery<ITvDetail>({
-    queryKey: ["tv", tvId + ""],
-    queryFn: () => getTvDetail(tvId + ""),
+    queryKey: ["tv", tv.id + ""],
+    queryFn: () => getTvDetail(tv.id + ""),
   });
   const { data: img, isLoading: imgLoading } = useQuery<IImages>({
-    queryKey: ["tv", tvId + "", "images"],
-    queryFn: () => getTvImages(tvId + ""),
+    queryKey: ["tv", tv.id + "", "images"],
+    queryFn: () => getTvImages(tv.id + ""),
   });
   const { data: imgUs, isLoading: imgUsLoading } = useQuery<IImages>({
-    queryKey: ["tv", tvId + "", "images_us"],
-    queryFn: () => getTvImagesUs(tvId + ""),
+    queryKey: ["tv", tv.id + "", "images_us"],
+    queryFn: () => getTvImagesUs(tv.id + ""),
   });
   const { data: providerData, isLoading: providerLoading } =
     useQuery<IWatchProviders>({
-      queryKey: ["tv", tvId + "", "watch_providers"],
-      queryFn: () => getWatchProvidersForTv(tvId + ""),
+      queryKey: ["tv", tv.id + "", "watch_providers"],
+      queryFn: () => getWatchProvidersForTv(tv.id + ""),
     });
-  const { data: episodes } = useQuery<IGetEpisodes>({
-    queryKey: ["tv", tvId + "", seasonNumber],
-    queryFn: () => getTvEpisodes(tvId + "", seasonNumber + ""),
-  });
+  /* Fetch Fluidly Depending on the Selected Tv-Series-Season  */
+  const [seasonNumber, setSeasonNumber] = useState(1);
   const handleSeasonChange = (event: any) => {
     setSeasonNumber(event.target.value);
   };
-  console.log(data);
-  const [stars, setStars] = useState<[number, number, number]>();
+  const { data: episodes, isLoading: episodesLoading } = useQuery<IGetEpisodes>(
+    {
+      queryKey: ["tv", tv.id + "", seasonNumber],
+      queryFn: () => getTvEpisodes(tv.id + "", seasonNumber + ""),
+    }
+  );
+  const loading =
+    isLoading ||
+    imgLoading ||
+    imgUsLoading ||
+    providerLoading ||
+    episodesLoading;
+
+  /* State Management */
+  const [stars, setStars] = useState<number[]>([0, 0, 0]);
   const [providers, setProviders] = useState<string[]>();
   const [logo, setLogo] = useState<string>("");
   useEffect(() => {
-    if (data?.vote_average) {
-      const rating = data.vote_average / 2;
-      const fullStar = Math.floor(rating);
-      let halfStar = rating - fullStar;
-      halfStar >= 0.5 ? (halfStar = 1) : (halfStar = 0);
-      setStars([fullStar, halfStar, 5 - fullStar - halfStar]);
-    }
-    if (img?.logos && img?.logos.length !== 0) {
-      setLogo(img.logos[0].file_path);
-    } else if (imgUs?.logos && imgUs?.logos.length !== 0) {
-      setLogo(imgUs.logos[0].file_path);
-    }
-    if (providerData && providerData?.results?.KR) {
-      const buys =
-        providerData?.results?.KR?.buy?.map((c) => c.logo_path) || [];
-      const flatrates =
-        providerData?.results?.KR?.flatrate?.map((c) => c.logo_path) || [];
-      const rents =
-        providerData?.results?.KR?.rent?.map((c) => c.logo_path) || [];
-      const result = [...buys, ...flatrates, ...rents];
-      setProviders(result);
-    }
+    if (data?.vote_average) setStars(() => getStarRating(data.vote_average));
+    if (img || imgUs) setLogo(() => getMainLogo(img, imgUs));
+    if (providerData) setProviders(() => getProviders(providerData));
   }, [data?.vote_average, img?.logos, providerData?.results?.KR]);
   return (
-    <Container
+    <DetailContainer
       layoutId={$isBanner ? "banner" : tv.id + category!}
       style={{ top: height + 32 }}
       variants={$isBanner ? bannerVars : undefined}
@@ -294,8 +156,9 @@ export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
       animate={$isBanner ? "visible" : undefined}
       exit={$isBanner ? "exit" : undefined}
     >
-      {!isLoading && (
+      {!loading && (
         <>
+          {/* Cover Image and Logo||Title */}
           <Cover
             style={{
               backgroundImage: `linear-gradient(transparent 50%, #181818 100%),
@@ -303,19 +166,21 @@ export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
                             tv.backdrop_path ?? tv.poster_path
                           )})`,
             }}
-          />
-          <Details>
-            <Detail>
-              {logo !== "" ? (
-                <Logo
-                  style={{
-                    backgroundImage: `url(${makeImagePath(logo)})`,
-                  }}
-                />
-              ) : (
-                <Title>{tv.name}</Title>
-              )}
+          >
+            {logo !== "" ? (
+              <Logo
+                style={{
+                  backgroundImage: `url(${makeImagePath(logo)})`,
+                }}
+              />
+            ) : (
+              <ContentName>{tv.name}</ContentName>
+            )}
+          </Cover>
 
+          <Details>
+            {/* Left side of Details */}
+            <Detail>
               <SmallDetailL>
                 <SmallBox>
                   <Adult>{data?.adult ? "19+" : "12+"}</Adult>
@@ -360,6 +225,7 @@ export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
               <Tagline>{data?.tagline && `❝${data.tagline}❞`}</Tagline>
               <Overview>{tv.overview}</Overview>
             </Detail>
+            {/* Right side of Details */}npm
             <Detail>
               {data?.genres && (
                 <SmallDetailR>
@@ -382,40 +248,40 @@ export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
                 </SmallDetailR>
               )}
             </Detail>
-            <>
-              {data?.production_companies && (
-                <Companies>
-                  {data.production_companies.map(
-                    (company, idx) =>
-                      company.logo_path && (
-                        <Company
-                          key={idx}
-                          style={{
-                            backgroundImage: `url(${makeImagePath(
-                              data?.production_companies[idx].logo_path!
-                            )})`,
-                          }}
-                        ></Company>
-                      )
-                  )}
-                </Companies>
-              )}
-              {providers && providers.length !== 0 ? (
-                <OTTs>
-                  {providers.map((provider, idx) => (
-                    <OTT
-                      key={idx}
-                      style={{
-                        backgroundImage: `url(${makeImagePath(provider)})`,
-                      }}
-                    ></OTT>
-                  ))}
-                </OTTs>
-              ) : (
-                <NoOTT>No OTT Provided Yet</NoOTT>
-              )}
-            </>
+            {/* Companies, Providers */}
+            {data?.production_companies && (
+              <Companies>
+                {data.production_companies.map(
+                  (company, idx) =>
+                    company.logo_path && (
+                      <Company
+                        key={idx}
+                        style={{
+                          backgroundImage: `url(${makeImagePath(
+                            data?.production_companies[idx].logo_path!
+                          )})`,
+                        }}
+                      ></Company>
+                    )
+                )}
+              </Companies>
+            )}
+            {providers && providers.length !== 0 ? (
+              <OTTs>
+                {providers.map((provider, idx) => (
+                  <OTT
+                    key={idx}
+                    style={{
+                      backgroundImage: `url(${makeImagePath(provider)})`,
+                    }}
+                  ></OTT>
+                ))}
+              </OTTs>
+            ) : (
+              <NoOTT>No OTT Provided Yet</NoOTT>
+            )}
           </Details>
+          {/* Shows Episodes of Each Season */}
           <Episodes>
             <EpisodeHeader>
               <h2>회차</h2>
@@ -468,6 +334,6 @@ export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
           </Episodes>
         </>
       )}
-    </Container>
+    </DetailContainer>
   );
 }

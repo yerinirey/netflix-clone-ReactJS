@@ -1,9 +1,23 @@
-import styled from "styled-components";
 import { IGetTvResult, ITv } from "../api";
 import { useQueryClient } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { categories, makeImagePath } from "../utils";
+import {
+  Box,
+  Button,
+  SliderContainer,
+  Info,
+  InfoBtn,
+  InfoBtnContainer,
+  Row,
+  Slider,
+  SliderTitle,
+  arrow,
+  boxVars,
+  categories,
+  infoVars,
+  makeImagePath,
+} from "../utils";
 import { useNavigate } from "react-router-dom";
 interface IProps {
   category: string;
@@ -11,137 +25,6 @@ interface IProps {
   width: number;
 }
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 300px;
-`;
-const Button = styled.button<{ position: "next" | "prev" }>`
-  transform: translateY(-50%);
-  height: 200px;
-  width: calc(124% / 8 - 8px - 12%);
-  background-color: rgba(0, 0, 0, 0.6);
-  border: none;
-  border-radius: ${(props) =>
-    props.position === "next" ? "8px 0 0 8px" : "0 8px 8px 0"};
-  cursor: pointer;
-  position: absolute;
-  top: 100px; // half of Box height
-  ${(props) => (props.position === "next" ? "right: 0;" : "left: 0;")}
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  svg {
-    opacity: 0;
-  }
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-    svg {
-      opacity: 1;
-    }
-  }
-`;
-
-const Title = styled.h1`
-  font-size: 1.6vw;
-  padding-left: 4%;
-  padding-bottom: 0.6vw;
-`;
-const Slider = styled.div`
-  overflow-x: visible;
-  width: 100%;
-  position: relative;
-  bottom: 0px;
-`;
-const Row = styled(motion.div)`
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  width: 124%;
-  left: -12%;
-  position: absolute;
-`;
-const Box = styled(motion.div)<{ $bgPhoto: string }>`
-  background-image: url(${(props) => props.$bgPhoto});
-  background-position: center center;
-  font-size: 40px;
-  background-size: cover;
-  height: 200px;
-  width: calc(100% / 8);
-  border-radius: 8px;
-  &:nth-child(2) {
-    transform-origin: center left;
-  }
-  &:nth-child(7) {
-    transform-origin: center right;
-  }
-  cursor: pointer;
-`;
-const Info = styled(motion.div)`
-  padding: 10px;
-  background-color: ${(props) => props.theme.black.darker};
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  left: 0;
-  right: 0;
-  bottom: -2.7vw;
-  border-radius: 0 0 8px 8px;
-  h4 {
-    text-align: left;
-    font-size: 1vw;
-  }
-`;
-const InfoBtnContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 10px;
-`;
-const InfoBtn = styled.div`
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  background-color: rgba(42, 42, 42, 0.6);
-  width: 1.2vw;
-  height: 1.2vw;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  svg {
-    width: 0.7vw;
-    height: 0.7vw;
-  }
-  &:first-child {
-    background-color: white;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-`;
-
-const infoVars = {
-  hover: {
-    opacity: 1,
-    transition: { delay: 0.4, type: "tween", duration: 0.2 },
-  },
-};
-const boxVars = {
-  normal: {
-    scale: 1,
-    boxShadow: "none",
-  },
-  hover: {
-    scale: 1.3,
-    y: -50,
-    transition: { delay: 0.4, type: "tween", duration: 0.2 },
-    boxShadow: "0px 0px 10px black",
-  },
-};
-const arrow = { PREV: "prev", NEXT: "next" };
 export default function TvSlider({ category, title, width }: IProps) {
   const cache = useQueryClient();
   const data = cache.getQueryData(["tv", category]) as IGetTvResult;
@@ -181,8 +64,8 @@ export default function TvSlider({ category, title, width }: IProps) {
     navigate(`/tv/${tvId}`);
   };
   return (
-    <Container>
-      <Title>{title}</Title>
+    <SliderContainer>
+      <SliderTitle>{title}</SliderTitle>
       <Slider>
         <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
           <Row
@@ -281,6 +164,6 @@ export default function TvSlider({ category, title, width }: IProps) {
           </svg>
         </Button>
       </Slider>
-    </Container>
+    </SliderContainer>
   );
 }

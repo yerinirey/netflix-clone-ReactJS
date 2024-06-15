@@ -1,35 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { IGetTvResult, ITv, getTopRatedTv } from "../api";
-import styled from "styled-components";
 import TvBanner from "../Components/TvBanner";
-import { categories } from "../utils";
+import { categories, Wrapper, Loader, Overlay } from "../utils";
 import { useEffect, useState } from "react";
 import TvSlider from "../Components/TvSlider";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { PathMatch, useMatch, useNavigate } from "react-router-dom";
 import TvDetail from "../Components/TvDetail";
-
-const Wrapper = styled.div`
-  background-color: ${(props) => props.theme.black.veryDark};
-  overflow-x: hidden;
-  overflow-y: hidden;
-  padding-bottom: 100px;
-`;
-const Loader = styled.div`
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1vw;
-`;
-const Overlay = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  opacity: 0;
-`;
 
 function Tv() {
   const { data: topData, isLoading: topLoading } = useQuery<IGetTvResult>({

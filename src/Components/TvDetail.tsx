@@ -225,7 +225,7 @@ export default function TvDetail({ tv, category, height, $isBanner }: IDetail) {
               <Tagline>{data?.tagline && `❝${data.tagline}❞`}</Tagline>
               <Overview>{tv.overview}</Overview>
             </Detail>
-            {/* Right side of Details */}npm
+            {/* Right side of Details */}
             <Detail>
               {data?.genres && (
                 <SmallDetailR>

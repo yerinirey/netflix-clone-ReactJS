@@ -164,6 +164,12 @@ export const Row = styled(motion.div)`
   width: 124%;
   left: -12%;
   position: absolute;
+  :nth-child(2) {
+    transform-origin: center left !important;
+  }
+  :nth-child(7) {
+    transform-origin: center right !important;
+  }
 `;
 export const Box = styled(motion.div)<{ $bgPhoto: string }>`
   background-image: url(${(props) => props.$bgPhoto});
@@ -173,12 +179,7 @@ export const Box = styled(motion.div)<{ $bgPhoto: string }>`
   height: 200px;
   width: calc(100% / 8);
   border-radius: 8px;
-  &:nth-child(2) {
-    transform-origin: center left;
-  }
-  &:nth-child(7) {
-    transform-origin: center right;
-  }
+
   cursor: pointer;
 `;
 export const Info = styled(motion.div)`

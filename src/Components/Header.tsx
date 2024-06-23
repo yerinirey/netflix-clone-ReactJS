@@ -17,7 +17,6 @@ const Nav = styled(motion.nav)`
   width: 100%;
   height: 68px;
   top: 0;
-  /* background-color: black; */
   font-size: 14px;
   font-weight: 500;
   color: white;
@@ -28,10 +27,24 @@ const Col = styled.div`
   display: flex;
   align-items: center;
 `;
-const Logo = styled(motion.svg)`
+const LogoBox = styled(motion.div)`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   margin-right: 60px;
-  width: 95px;
-  height: 25px;
+  gap: 6px;
+  cursor: pointer;
+  span {
+    display: inline-block;
+    font-size: 28px;
+    font-weight: bolder;
+    font-style: oblique;
+  }
+`;
+const Logo = styled.svg`
+  width: 30px;
+  height: 30px;
   fill: ${(props) => props.theme.red};
 `;
 const Items = styled.ul`
@@ -145,18 +158,22 @@ function Header() {
   return (
     <Nav variants={navVars} animate={navAnimation} initial={"top"}>
       <Col>
-        <Logo
+        <LogoBox
           onClick={() => navigate("/")}
           variants={logoVars}
           initial="normal"
           whileHover="active"
-          xmlns="http://www.w3.org/2000/svg"
-          width="1024"
-          height="276.742"
-          viewBox="0 0 1024 276.742"
         >
-          <motion.path d="M140.803 258.904c-15.404 2.705-31.079 3.516-47.294 5.676L44.051 119.724v151.073C28.647 272.418 14.594 274.58 0 276.742V0h41.08l56.212 157.021V0h43.511zm85.131-157.558c16.757 0 42.431-.811 57.835-.811v43.24c-19.189 0-41.619 0-57.835.811v64.322c25.405-1.621 50.809-3.785 76.482-4.596v41.617l-119.724 9.461V0h119.724v43.241h-76.482zm237.284-58.104h-44.862V242.15c-14.594 0-29.188 0-43.239.539V43.242h-44.862V0H463.22zm70.266 55.132h59.187v43.24h-59.187v98.104h-42.433V0h120.808v43.241h-78.375zm148.641 103.507c24.594.539 49.456 2.434 73.51 3.783v42.701c-38.646-2.434-77.293-4.863-116.75-5.676V0h43.24zm109.994 49.457c13.783.812 28.377 1.623 42.43 3.242V0h-42.43zM1024 0l-54.863 131.615L1024 276.742c-16.217-2.162-32.432-5.135-48.648-7.838l-31.078-79.994-31.617 73.51c-15.678-2.705-30.812-3.516-46.484-5.678l55.672-126.75L871.576 0h46.482l28.377 72.699L976.705 0z" />
-        </Logo>
+          <Logo
+            xmlns="http://www.w3.org/2000/svg"
+            width="1024"
+            height="276.742"
+            viewBox="0 0 576 512"
+          >
+            <path d="M320 192h17.1c22.1 38.3 63.5 64 110.9 64c11 0 21.8-1.4 32-4v4 32V480c0 17.7-14.3 32-32 32s-32-14.3-32-32V339.2L280 448h56c17.7 0 32 14.3 32 32s-14.3 32-32 32H192c-53 0-96-43-96-96V192.5c0-16.1-12-29.8-28-31.8l-7.9-1c-17.5-2.2-30-18.2-27.8-35.7s18.2-30 35.7-27.8l7.9 1c48 6 84.1 46.8 84.1 95.3v85.3c34.4-51.7 93.2-85.8 160-85.8zm160 26.5v0c-10 3.5-20.8 5.5-32 5.5c-28.4 0-54-12.4-71.6-32h0c-3.7-4.1-7-8.5-9.9-13.2C357.3 164 352 146.6 352 128v0V32 12 10.7C352 4.8 356.7 .1 362.6 0h.2c3.3 0 6.4 1.6 8.4 4.2l0 .1L384 21.3l27.2 36.3L416 64h64l4.8-6.4L512 21.3 524.8 4.3l0-.1c2-2.6 5.1-4.2 8.4-4.2h.2C539.3 .1 544 4.8 544 10.7V12 32v96c0 17.3-4.6 33.6-12.6 47.6c-11.3 19.8-29.6 35.2-51.4 42.9zM432 128a16 16 0 1 0 -32 0 16 16 0 1 0 32 0zm48 16a16 16 0 1 0 0-32 16 16 0 1 0 0 32z" />
+          </Logo>
+          <span>MEOWVIES</span>
+        </LogoBox>
         <Items>
           <Item>
             <Link to="/">홈{homeMatch && <Circle layoutId="circle" />}</Link>

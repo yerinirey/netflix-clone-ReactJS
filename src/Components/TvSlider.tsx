@@ -28,6 +28,7 @@ interface IProps {
 export default function TvSlider({ category, title, width }: IProps) {
   const cache = useQueryClient();
   const data = cache.getQueryData(["tv", category]) as IGetTvResult;
+  const [loading, setLoading] = useState(true);
   const [isNext, setIsNext] = useState<boolean>();
   const [leaving, setLeaving] = useState(false);
   const [index, setIndex] = useState(0);
@@ -37,6 +38,7 @@ export default function TvSlider({ category, title, width }: IProps) {
   useEffect(() => {
     if (category === categories.tv.TOP_RATED)
       setTvs(data?.results.filter((_, idx) => idx !== 0));
+    setLoading(false);
   }, [data?.results]);
   const onNextIndex = async (dir: string) => {
     if (tvs) {
@@ -63,7 +65,9 @@ export default function TvSlider({ category, title, width }: IProps) {
   const onBoxClick = (tvId: number) => {
     navigate(`/tv/${tvId}`);
   };
-  return (
+  return loading ? (
+    <div>Loading</div>
+  ) : (
     <SliderContainer>
       <SliderTitle>{title}</SliderTitle>
       <Slider>

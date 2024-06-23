@@ -28,7 +28,7 @@ interface IProps {
 export default function MovieSlider({ category, title, width }: IProps) {
   const cache = useQueryClient();
   const data = cache.getQueryData(["movies", category]) as IGetMoviesResult;
-
+  const [loading, setLoading] = useState(true);
   const [isNext, setIsNext] = useState<boolean>();
   const [leaving, setLeaving] = useState(false);
   const [index, setIndex] = useState(0);
@@ -38,6 +38,7 @@ export default function MovieSlider({ category, title, width }: IProps) {
   useEffect(() => {
     if (category === categories.movie.NOW_PLAYING)
       setMovies(data?.results.filter((_, idx) => idx !== 0));
+    setLoading(false);
   }, [data?.results]);
   const onNextIndex = async (dir: string) => {
     if (movies) {
@@ -64,7 +65,9 @@ export default function MovieSlider({ category, title, width }: IProps) {
   const onBoxClick = (movieId: number) => {
     navigate(`/movies/${movieId}`);
   };
-  return (
+  return loading ? (
+    <div>Loading</div>
+  ) : (
     <SliderContainer>
       <SliderTitle>{title}</SliderTitle>
       <Slider>
